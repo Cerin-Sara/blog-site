@@ -76,6 +76,7 @@ elif choice == 'View blog':
         b_content = i[2]
         b_tag = i[3]
         b_date = i[4]
+        st.text("Reading Time:{} minutes".format(readingTime(str(i[2]))))
         st.markdown(article_temp.format(b_title, b_author, b_content, b_date), unsafe_allow_html=True)
 
 elif choice == 'Manage blog':
@@ -84,12 +85,12 @@ elif choice == 'Manage blog':
     clean_db = pd.DataFrame(result, columns=['Author', 'Title', 'Content', 'Tag', 'Date'])
     st.dataframe(clean_db)
     selected_title = st.selectbox('Select blog to delete', clean_db['Title'])
-
-    if st.sidebar.button("Delete"):
+    st.warning("Are you sure you want to delete {}?".format(selected_title))
+    if st.button("Delete"):
         delete_blog_by_title(selected_title)
         st.warning("Deleted {} successfully".format(selected_title))
     
-    if st.sidebar.checkbox("Matrix"):
+    if st.sidebar.checkbox("Statistics"):
         newDf=clean_db
         newDf['Length']=newDf['Content'].str.len()
         st.dataframe(newDf)
@@ -136,6 +137,7 @@ elif choice == 'Search blog':
             b_content = i[2]
             b_tag = i[3]
             b_date = i[4]
+            st.text("Reading Time:{} minutes".format(readingTime(str(i[2]))))
             st.markdown(article_temp.format(b_title, b_author, b_content, b_date), unsafe_allow_html=True)
 
     elif search_field=='title':
@@ -146,6 +148,7 @@ elif choice == 'Search blog':
             b_content = i[2]
             b_tag = i[3]
             b_date = i[4]
+            st.text("Reading Time:{} minutes".format(readingTime(str(i[2]))))
             st.markdown(article_temp.format(b_title, b_author, b_content, b_date), unsafe_allow_html=True)
     
     elif search_field=='tag':
@@ -156,6 +159,7 @@ elif choice == 'Search blog':
             b_content = i[2]
             b_tag = i[3]
             b_date = i[4]
+            st.text("Reading Time:{} minutes".format(readingTime(str(i[2]))))
             st.markdown(article_temp.format(b_title, b_author, b_content, b_date), unsafe_allow_html=True)
     
     elif search_field=='date':
@@ -166,6 +170,7 @@ elif choice == 'Search blog':
             b_content = i[2]
             b_tag = i[3]
             b_date = i[4]
+            st.text("Reading Time:{} minutes".format(readingTime(str(i[2]))))
             st.markdown(article_temp.format(b_title, b_author, b_content, b_date), unsafe_allow_html=True)
     
 

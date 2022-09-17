@@ -43,6 +43,11 @@ def delete_blog_by_title(title):
     c.execute('DELETE FROM blogtables WHERE title="{}"'.format(title))
     conn.commit()
 
+def readingTime(mytext):
+	total_words = len([ token for token in mytext.split(" ")])
+	estimatedTime = total_words/200.0
+	return estimatedTime
+
 
 # def drop_table():
 #     c.execute('DROP TABLE blogtable')
