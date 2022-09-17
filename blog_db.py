@@ -19,10 +19,30 @@ def view_all_titles():
     data = c.fetchall()
     return data
 
-def view_selected_blog(title):
+def view_selected_blog_by_title(title):
     c.execute('SELECT * FROM blogtables WHERE title="{}"'.format(title))
     data = c.fetchall()
     return data
+
+def view_selected_blog_by_author(author):
+    c.execute('SELECT * FROM blogtables WHERE author="{}"'.format(author))
+    data = c.fetchall()
+    return data
+
+def view_selected_blog_by_tag(tag):
+    c.execute('SELECT * FROM blogtables WHERE tag="{}"'.format(tag))
+    data = c.fetchall()
+    return data
+
+def view_selected_blog_by_date(date):
+    c.execute('SELECT * FROM blogtables WHERE date="{}"'.format(date))
+    data = c.fetchall()
+    return data
+
+def delete_blog_by_title(title):
+    c.execute('DELETE FROM blogtables WHERE title="{}"'.format(title))
+    conn.commit()
+
 
 # def drop_table():
 #     c.execute('DROP TABLE blogtable')

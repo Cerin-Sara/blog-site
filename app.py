@@ -1,31 +1,36 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('Agg')
 from blog_db import *
+from wordcloud import *
 
 
 
 title_temp ="""
-        <div style="background-color:#464e5f;padding:10px;border-radius:10px;margin:10px;">
-            <h3 style="color:white;text-align:center;">{}</h3>
+        <div style="background-color:#C3F8FF;padding:10px;border-radius:10px;margin:10px;">
+            <h3 style="color:#0E1117;text-align:center;">{}</h3>
+            <h6 style="color:#0E1117;text-align:center;">{}</h6>
             <img src="https://www.w3schools.com/howto/img_avatar.png" alt="Avatar" style="vertical-align: middle;float:left;width: 50px;height: 50px;border-radius: 50%;" >
-            <h6>{}</h6>   
-            <p style="text-align:justify">{}</p>
+            <p style="text-align:justify;color:#0E1117">{}</p>
         </div>
 """
 
 article_temp ="""
-        <div style="background-color:#464e5f;padding:10px;border-radius:5px;margin:10px;">
-        <h4 style="color:white;text-align:center;">{}</h1>
+        <div style="background-color:#C3F8FF;padding:10px;border-radius:5px;margin:10px;">
+        <h4 style="color:#0E1117;text-align:center;">{}</h1>
+        <h6 style="color:#0E1117;text-align:center">By:{}</h6> 
         <img src="https://www.w3schools.com/howto/img_avatar.png" alt="Avatar" style="vertical-align: middle;width: 50px;height: 50px;border-radius: 50%;" >
-        <h6>Author:{}</h6> 
         <br/>
-        <p style="text-align:justify;color:white">{}</p>
-        <h6 style="float:right">Posted on:{}</h6>
+        <p style="text-align:justify;color:#0E1117">{}</p>
+        <h6 style="float:right;color:#0E1117">Posted on:{}</h6>
         <br/>
         <br/>
         </div>
 """
+
 
 st.title('Blog')
 def get_choice():
@@ -64,7 +69,7 @@ elif choice == 'View blog':
     for i in all_titles:
         title_list.append(i[0])
     selected_title = st.sidebar.selectbox('Select blog', title_list)
-    single_full_blog = view_selected_blog(selected_title)
+    single_full_blog = view_selected_blog_by_title(selected_title)
     for i in single_full_blog:
         b_author = i[0]
         b_title = i[1]
@@ -75,8 +80,93 @@ elif choice == 'View blog':
 
 elif choice == 'Manage blog':
     st.subheader('Manage blog')
+    result = view_all_blogs()
+    clean_db = pd.DataFrame(result, columns=['Author', 'Title', 'Content', 'Tag', 'Date'])
+    st.dataframe(clean_db)
+    selected_title = st.selectbox('Select blog to delete', clean_db['Title'])
+
+    if st.sidebar.button("Delete"):
+        delete_blog_by_title(selected_title)
+        st.warning("Deleted {} successfully".format(selected_title))
+    
+    if st.sidebar.checkbox("Matrix"):
+        newDf=clean_db
+        newDf['Length']=newDf['Content'].str.len()
+        st.dataframe(newDf)
+
+        st.subheader("Author Staticss")
+        newDf['Author'].value_counts().plot(kind='bar')
+        st.set_option('deprecation.showPyplotGlobalUse', False)
+        st.pyplot()
+
+        newDf['Author'].value_counts().plot.pie(autopct="%1.1f%%")
+        st.set_option('deprecation.showPyplotGlobalUse', False)
+        plt.axis("off")
+        st.pyplot()
+
+    if st.sidebar.checkbox("Word Cloud"):
+        newDf=clean_db
+        st.subheader("Generating Word Cloud")
+        text = ",".join(newDf['Content'])
+        wc = WordCloud().generate(text)
+        plt.imshow(wc, interpolation='bilinear')
+        plt.axis("off")
+        st.pyplot()
+    
+    if st.sidebar.checkbox("Article Length"):
+        newDf=clean_db
+        st.subheader("Article Length")
+        newDf['Length']= newDf['Content'].str.len()
+        barPlot = newDf.plot.barh(x='Author', y='Length', rot=0)
+        st.set_option('deprecation.showPyplotGlobalUse', False)
+        st.pyplot()
+
+
+    
 
 elif choice == 'Search blog':
     st.subheader('Search blog')
+    search_field = st.radio("Select the field", ('author', 'title', 'tag', 'date'))
+    search_item = st.text_input("Enter the {}'s name by which you want to Search".format(search_field))
+    if search_field=='author':
+        result = view_selected_blog_by_author(search_item)
+        for i in result:
+            b_author = i[0]
+            b_title = i[1]
+            b_content = i[2]
+            b_tag = i[3]
+            b_date = i[4]
+            st.markdown(article_temp.format(b_title, b_author, b_content, b_date), unsafe_allow_html=True)
+
+    elif search_field=='title':
+        result = view_selected_blog_by_title(search_item)
+        for i in result:
+            b_author = i[0]
+            b_title = i[1]
+            b_content = i[2]
+            b_tag = i[3]
+            b_date = i[4]
+            st.markdown(article_temp.format(b_title, b_author, b_content, b_date), unsafe_allow_html=True)
+    
+    elif search_field=='tag':
+        result = view_selected_blog_by_tag(search_item)
+        for i in result:
+            b_author = i[0]
+            b_title = i[1]
+            b_content = i[2]
+            b_tag = i[3]
+            b_date = i[4]
+            st.markdown(article_temp.format(b_title, b_author, b_content, b_date), unsafe_allow_html=True)
+    
+    elif search_field=='date':
+        result = view_selected_blog_by_date(search_item)
+        for i in result:
+            b_author = i[0]
+            b_title = i[1]
+            b_content = i[2]
+            b_tag = i[3]
+            b_date = i[4]
+            st.markdown(article_temp.format(b_title, b_author, b_content, b_date), unsafe_allow_html=True)
+    
 
 st.sidebar.write('Made with ❤️ by saracerin')
